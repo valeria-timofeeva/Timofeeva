@@ -1,9 +1,11 @@
 package ru.timofeeva.developerslife
 
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,24 +21,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.CircularReveal
-import com.skydoves.landscapist.ShimmerParams
-import com.skydoves.landscapist.glide.GlideImage
+import coil.ImageLoader
+import coil.compose.rememberImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import ru.timofeeva.developerslife.models.Post
 import ru.timofeeva.developerslife.models.Tab
 import ru.timofeeva.developerslife.ui.theme.DevelopersLifeTheme
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var imageLoader: ImageLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        imageLoader = ImageLoader.Builder(applicationContext)
+            .componentRegistry {
+                if (SDK_INT >= 28) {
+                    add(ImageDecoderDecoder(applicationContext))
+                } else {
+                    add(GifDecoder())
+                }
+            }
+            .build()
+
         setContent {
             PostScreen()
         }
@@ -54,8 +69,7 @@ class MainActivity : ComponentActivity() {
                     AppBar()
                     Tabs(viewState.selectedTab)
                     PostCard(
-                        currentPostUrl = viewState.currentPostUrl,
-                        currentPostText = viewState.currentPostText,
+                        currentPost = viewState.currentPost,
                         isLoading = viewState.isLoading
                     )
                     PostNavigationButtons(
@@ -110,8 +124,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun ColumnScope.PostCard(
-        currentPostUrl: String,
-        currentPostText: String,
+        currentPost: Post?,
         isLoading: Boolean
     ) {
         Surface(
@@ -121,20 +134,24 @@ class MainActivity : ComponentActivity() {
                 .padding(top = 8.dp)
                 .padding(horizontal = 8.dp)
                 .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+                .background(color = Color.Red)
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                GlideImage(
-                    imageModel = currentPostUrl,
-                    contentScale = ContentScale.FillBounds,
-                    circularReveal = CircularReveal(250),
-                    shimmerParams = ShimmerParams(
-                        Color.LightGray,
-                        highlightColor = Color.Yellow
-                    ),
-                    error = "Ошибка при загрузке изображения"
-                )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (currentPost != null) {
+                    Image(
+                        painter = rememberImagePainter(
+                            data = currentPost.gifUrl.replace("http://", "https://"),
+                            imageLoader = imageLoader
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
                 Text(
-                    text = currentPostText,
+                    text = currentPost?.text ?: "",
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(8.dp)
@@ -189,7 +206,5 @@ class MainActivity : ComponentActivity() {
             PostNavigationButtons()
         }
     }
-
-
 }
 
