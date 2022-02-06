@@ -73,4 +73,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+
+    //Glide
+    implementation "com.github.skydoves:landscapist-glide:1.4.5"
+
+    //LiveData
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 }

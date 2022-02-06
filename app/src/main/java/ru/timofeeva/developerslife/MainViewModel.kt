@@ -11,6 +11,14 @@ class MainViewModel : ViewModel() {
     fun getState(): LiveData<ViewState> {
         return _state
     }
+
+    fun onNextPostClick() {
+
+    }
+
+    fun onPreviousPostClick() {
+
+    }
 }
 
 data class ViewState(
