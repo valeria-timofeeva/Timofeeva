@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -204,9 +205,8 @@ class MainActivity : ComponentActivity() {
     private fun Tabs(selectedTab: Tab) {
         TabRow(
             selectedTabIndex = selectedTab.ordinal,
-            Modifier
-                .height(48.dp)
-                .background(color = Color.White)
+            Modifier.height(48.dp),
+            contentColor = Color.White
         ) {
             Tab(
                 selected = selectedTab == Tab.Recent,
@@ -238,6 +238,7 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = "Developers Life",
+                fontFamily = FontFamily.Serif,
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.h5,
                 textAlign = TextAlign.Center,
