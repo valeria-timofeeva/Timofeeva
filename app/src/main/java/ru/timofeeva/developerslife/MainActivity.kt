@@ -20,6 +20,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -183,9 +184,18 @@ class MainActivity : ComponentActivity() {
             color = Color.White,
             modifier = Modifier.Companion
                 .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Gray
+                        )
+                    )
+                )
                 .padding(8.dp)
+                .padding(top = 16.dp)
                 .fillMaxWidth()
-                .background(color = Color(0x80616161))
+
         )
 
     }

@@ -14,7 +14,7 @@ class MainViewModel : ViewModel() {
 
     private val _state: MutableLiveData<ViewState> = MutableLiveData(ViewState())
     private val postCache: MutableList<Post> = mutableListOf()
-    private var currentPostPosition: Int = 1
+    private var currentPostPosition: Int = 0
 
     fun getState(): LiveData<ViewState> {
         return _state
