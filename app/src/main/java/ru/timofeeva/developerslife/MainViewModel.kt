@@ -12,6 +12,14 @@ class MainViewModel : ViewModel() {
         return _state
     }
 
+    init {
+        loadNextPost()
+    }
+
+    private fun loadNextPost() {
+        _state.value = ViewState(currentPostText = "Text")
+    }
+
     fun onNextPostClick() {
 
     }
@@ -23,6 +31,8 @@ class MainViewModel : ViewModel() {
 
 data class ViewState(
     val selectedTab: Tab = Tab.Recent,
-    val currentPost: String = "",
-    val isLoading: Boolean = false
+    val currentPostText: String = "",
+    val currentPostUrl: String = "",
+    val isLoading: Boolean = false,
+    val isPreviousButtonIsActive: Boolean = false
 )

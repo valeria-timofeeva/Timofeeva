@@ -54,10 +54,15 @@ class MainActivity : ComponentActivity() {
                     AppBar()
                     Tabs(viewState.selectedTab)
                     PostCard(
-                        viewState.currentPost,
-                        viewState.isLoading
+                        currentPostUrl = viewState.currentPostUrl,
+                        currentPostText = viewState.currentPostText,
+                        isLoading = viewState.isLoading
                     )
-                    PostNavigationButtons()
+                    PostNavigationButtons(
+                        onNextClick = { viewModel.onNextPostClick() },
+                        onPreviousCLick = { viewModel.onPreviousPostClick() },
+                        isPreviousButtonActive = viewState.isPreviousButtonIsActive
+                    )
                 }
             }
         }
@@ -104,7 +109,11 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ColumnScope.PostCard(currentPost: String, isLoading: Boolean) {
+    private fun ColumnScope.PostCard(
+        currentPostUrl: String,
+        currentPostText: String,
+        isLoading: Boolean
+    ) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -115,7 +124,7 @@ class MainActivity : ComponentActivity() {
         ) {
             Box(contentAlignment = Alignment.Center) {
                 GlideImage(
-                    imageModel = "http://static.devli.ru/public/images/gifs/202109/518d3a2b-42eb-4b05-8e81-a5329a1d8288.gif",
+                    imageModel = currentPostUrl,
                     contentScale = ContentScale.FillBounds,
                     circularReveal = CircularReveal(250),
                     shimmerParams = ShimmerParams(
@@ -125,26 +134,26 @@ class MainActivity : ComponentActivity() {
                     error = "Ошибка при загрузке изображения"
                 )
                 Text(
-                    text = "Text of post",
+                    text = currentPostText,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(8.dp)
                 )
-                CircularProgressIndicator()
+                if (isLoading) CircularProgressIndicator()
             }
         }
     }
 
     @Composable
     private fun Tabs(selectedTab: Tab) {
-        TabRow(selectedTabIndex = 0, Modifier.height(48.dp)) {
-            Tab(selected = true, onClick = { /*TODO*/ }) {
+        TabRow(selectedTabIndex = selectedTab.ordinal, Modifier.height(48.dp)) {
+            Tab(selected = selectedTab == Tab.Recent, onClick = { /*TODO*/ }) {
                 Text(text = "Последние")
             }
-            Tab(selected = false, enabled = false, onClick = { /*TODO*/ }) {
+            Tab(selected = selectedTab == Tab.Best, enabled = false, onClick = { /*TODO*/ }) {
                 Text(text = "Лучшие")
             }
-            Tab(selected = false, enabled = false, onClick = { /*TODO*/ }) {
+            Tab(selected = selectedTab == Tab.Hot, enabled = false, onClick = { /*TODO*/ }) {
                 Text(text = "Горячие")
             }
         }
@@ -171,12 +180,6 @@ class MainActivity : ComponentActivity() {
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-
-    @Preview(showBackground = true, device = Devices.NEXUS_5X)
-    @Composable
-    fun DefaultPreview() {
-        PostScreen()
     }
 
     @Preview(showBackground = true, device = Devices.NEXUS_5X)
