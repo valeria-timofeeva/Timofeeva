@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -70,7 +71,8 @@ class MainActivity : ComponentActivity() {
                     Tabs(viewState.selectedTab)
                     PostCard(
                         currentPost = viewState.currentPost,
-                        isLoading = viewState.isLoading
+                        isLoading = viewState.isLoading,
+                        hasError = viewState.hasError
                     )
                     PostNavigationButtons(
                         onNextClick = { viewModel.onNextPostClick() },
@@ -101,7 +103,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .size(48.dp)
                         .clickable(onClick = onPreviousCLick, enabled = isPreviousButtonActive),
-                    tint = if (isPreviousButtonActive) Color(0xFFCDDC39) else Color(0xFFB0B1A3),
+                    tint = if (isPreviousButtonActive) Color(0xFFFFC107) else Color(0xFFB0B1A3),
                     imageVector = Icons.Rounded.Refresh,
                     contentDescription = "previous post"
                 )
@@ -125,6 +127,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun ColumnScope.PostCard(
         currentPost: Post?,
+        hasError: Boolean,
         isLoading: Boolean
     ) {
         Surface(
@@ -140,38 +143,72 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                if (currentPost != null) {
-                    Image(
-                        painter = rememberImagePainter(
-                            data = currentPost.gifUrl.replace("http://", "https://"),
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                when {
+                    hasError -> LoadingErrorView()
+                    isLoading -> CircularProgressIndicator()
+                    currentPost != null -> PostContent(currentPost = currentPost)
                 }
-                Text(
-                    text = currentPost?.text ?: "",
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(8.dp)
-                )
-                if (isLoading) CircularProgressIndicator()
             }
         }
     }
 
     @Composable
+    private fun LoadingErrorView() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                modifier = Modifier.size(64.dp),
+                painter = painterResource(id = R.drawable.ic_round_cloud_off_24),
+                contentDescription = null
+            )
+            Text(
+                text = stringResource(R.string.loading_error),
+                style = MaterialTheme.typography.subtitle1
+            )
+        }
+    }
+
+    @Composable
+    private fun BoxScope.PostContent(currentPost: Post) {
+        Image(
+            painter = rememberImagePainter(
+                data = currentPost.gifUrl.replace("http://", "https://"),
+                imageLoader = imageLoader
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        Text(
+            text = currentPost.text,
+            color = Color.White,
+            modifier = Modifier.Companion
+                .align(Alignment.BottomCenter)
+                .padding(8.dp)
+                .fillMaxWidth()
+                .background(color = Color(0x80616161))
+        )
+
+    }
+
+    @Composable
     private fun Tabs(selectedTab: Tab) {
-        TabRow(selectedTabIndex = selectedTab.ordinal, Modifier.height(48.dp)) {
-            Tab(selected = selectedTab == Tab.Recent, onClick = { /*TODO*/ }) {
-                Text(text = "Последние")
+        TabRow(
+            selectedTabIndex = selectedTab.ordinal,
+            Modifier
+                .height(48.dp)
+                .background(color = Color.White)
+        ) {
+            Tab(
+                selected = selectedTab == Tab.Recent,
+                onClick = { /*TODO*/ }
+            ) {
+                Text(text = stringResource(R.string.tab_label_recent), color = Color.Black)
             }
             Tab(selected = selectedTab == Tab.Best, enabled = false, onClick = { /*TODO*/ }) {
-                Text(text = "Лучшие")
+                Text(text = stringResource(R.string.tab_label_best), color = Color.LightGray)
             }
             Tab(selected = selectedTab == Tab.Hot, enabled = false, onClick = { /*TODO*/ }) {
-                Text(text = "Горячие")
+                Text(text = stringResource(R.string.tab_label_hot), color = Color.LightGray)
             }
         }
     }
@@ -204,6 +241,14 @@ class MainActivity : ComponentActivity() {
     fun ButtonsPreview() {
         Column {
             PostNavigationButtons()
+        }
+    }
+
+    @Preview(showBackground = true, device = Devices.NEXUS_5X)
+    @Composable
+    fun PostCardPreview() {
+        Column {
+            PostCard(currentPost = null, hasError = true, isLoading = false)
         }
     }
 }
