@@ -225,21 +225,27 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun AppBar() {
-        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            Modifier
+                .padding(8.dp)
+                .fillMaxWidth()) {
             Icon(
-                modifier = Modifier.background(
-                    color = Color.LightGray,
-                    shape = CircleShape
-                ),
+                modifier = Modifier
+                    .background(
+                        color = Color.LightGray,
+                        shape = CircleShape
+                    )
+                    .align(Alignment.CenterStart),
                 painter = painterResource(id = R.drawable.ic_baseline_person_24),
                 tint = Color.White,
                 contentDescription = "Profile icon",
             )
-            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = "Developers Life",
                 fontFamily = FontFamily.Serif,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
                 style = MaterialTheme.typography.h5,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
